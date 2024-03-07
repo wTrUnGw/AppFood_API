@@ -8,11 +8,12 @@ import {
   rateappfood,
   getUserRate,
   order,
+  getalluser,
 } from "../controller/appFoodController.js";
 
 const appfoodRoute = express.Router();
 
-
+appfoodRoute.get("/user", getalluser);
 appfoodRoute.get("/get", getappfood);
 appfoodRoute.post("/like", likeappfood);
 appfoodRoute.post("/unlike", unlikeappfood);

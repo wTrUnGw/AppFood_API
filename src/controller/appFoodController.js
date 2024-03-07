@@ -1,8 +1,6 @@
 import mysql from "mysql2";
 import sequelize from "../models/connect.js";
-import initModels from "../models/init-model.js";
-import { where } from "sequelize";
-
+import initModels from "../models/init-models.js";
 // MODEL SEQUELIZE
 let model = initModels(sequelize);
 
@@ -12,78 +10,92 @@ const connect = mysql.createConnection({
   user: "root",
   password: "1234",
   port: "3307",
-  database: "db_youtube",
+  database: "AppFood",
 });
 
-// LẤY DANH SÁCH NHÀ HÀNG
+// LẤY DANH SÁCH NGƯỜI DÙNG
+const getalluser = async (req, res) => {
+  try {
+    let data = await model.user.findAll();
+
+    res.status(200).send(data);
+  } catch {
+    console.log("Sao lỗi thế");
+  }
+};
+
+// LẤY DANH SÁCH APPFOOD
 const getappfood = async (req, res) => {
   try {
     let data = await model.appfood.findAll();
 
     res.status(200).send(data);
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
-// LIKE NHÀ HÀNG
+// LIKE APPFOOD
 const likeappfood = async (req, res) => {
   try {
-    // let { appfoodId } = req.params;
     let { user_id, appfoodId } = req.body;
 
     await model.like_res.create({
-      res_id: appfoodId,
+      appfood_id: appfoodId,
       user_id: user_id,
       date_like: new Date(),
     });
 
     res.status(201).json({ message: "Like success" });
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
-// UNLIKE NHÀ HÀNG
+// UNLIKE APPFOOD
 const unlikeappfood = async (req, res) => {
   // đồng bộ => try catch, async await
   try {
     let { user_id, appfoodId } = req.body;
+    console.log({ user_id, appfoodId });
+
     // Kiểm tra xem đã có lượt like từ người dùng cho bài viết này chưa
     let likeRecord = await model.like_res.findOne({
       where: {
-        res_id: appfoodId,
+        appfood_id: appfoodId,
         user_id: user_id,
       },
     });
+    console.log(likeRecord);
 
     if (likeRecord) {
       // Nếu đã có lượt like, xóa lượt like khỏi cơ sở dữ liệu
       await model.like_res.destroy({
         where: {
-          res_id: appfoodId,
+          appfood_id: appfoodId,
           user_id: user_id,
         },
       });
 
       res.status(201).json({ message: "Unlike success" });
+      return;
     } else {
       res.status(404).json({ error: "Like not found" });
     }
-    res.status(200).send(likeRecord);
+    res.status(200).send({ data: likeRecord });
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
-// LẤY LIKE CỦA NHÀ HÀNG
+// LẤY LIKE CỦA APP FOOD
 const getLikeOfappfood = async (req, res) => {
   try {
     let { appfoodId } = req.body;
 
     let appfood = await model.like_res.findAndCountAll({
       where: {
-        res_id: appfoodId,
+        appfood_id: appfoodId,
       },
     });
 
@@ -91,24 +103,24 @@ const getLikeOfappfood = async (req, res) => {
 
     res.status(200).send(`Số lượng like của nhà hàng: ${appfood.count}`);
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
-// LẤY NHỮNG ĐÁNH GIÁ CỦA NHÀ HÀNG
+// LẤY NHỮNG ĐÁNH GIÁ CỦA APP FOOD
 const getRateappfood = async (req, res) => {
   try {
     let { appfoodId } = req.body;
 
     let data = await model.rate_res.findAll({
       where: {
-        res_id: appfoodId,
+        appfood_id: appfoodId,
       },
     });
 
     res.status(200).send(data);
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
@@ -125,17 +137,17 @@ const getUserRate = async (req, res) => {
 
     res.status(200).send(data);
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
-// ĐÁNH GIÁ NHÀ HÀNG
+// ĐÁNH GIÁ APPFOOD
 const rateappfood = async (req, res) => {
   try {
     let { user_id, appfoodId, amount } = req.body;
 
     await model.rate_res.create({
-      res_id: appfoodId,
+      appfood_id: appfoodId,
       user_id: user_id,
       date_rate: new Date(),
       amount: amount,
@@ -143,7 +155,7 @@ const rateappfood = async (req, res) => {
 
     res.status(201).json({ message: "Rate success" });
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
@@ -162,7 +174,7 @@ const order = async (req, res) => {
 
     res.status(201).json({ message: "Order success" });
   } catch {
-    console.log("lỖI");
+    console.log("Sao lỗi thế");
   }
 };
 
@@ -176,4 +188,5 @@ export {
   rateappfood,
   getUserRate,
   order,
+  getalluser,
 };

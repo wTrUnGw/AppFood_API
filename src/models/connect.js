@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize("db_youtube", "root", "1234", {
+const sequelize = new Sequelize("AppFood", "root", "1234", {
   host: "localhost",
   port: "3307",
   dialect: "mysql", // CSDL đang sử dụng

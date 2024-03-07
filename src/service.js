@@ -24,7 +24,7 @@ const connect = mysql.createConnection({
   user: "root",
   password: "1234",
   port: "3307",
-  database: "db_youtube",
+  database: "AppFood",
 });
 
 import rootRoute from "./routes/rootRoutes.js";
